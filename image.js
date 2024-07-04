@@ -9,17 +9,14 @@ const handleImage = (req, res, db) => {
 }
 
 const returnClarifaiRequestOptions = (imageUrl) => {
-    const PAT = 'b938cfb94a2d47f0b7603c7242c41729';
-    const USER_ID = 'ejisadev19';       
-    const APP_ID = 'my-first-application-zy4wsp';
   
     // const MODEL_ID = 'face-detection';  
     const IMAGE_URL = imageUrl;
   
     const raw = JSON.stringify({
       "user_app_id": {
-          "user_id": USER_ID,
-          "app_id": APP_ID
+          "user_id": process.env.USER_ID,
+          "app_id": process.env.APP_ID
       },
       "inputs": [
           {
@@ -36,7 +33,7 @@ const returnClarifaiRequestOptions = (imageUrl) => {
       method: 'POST',
       headers: {
           'Accept': 'application/json',
-          'Authorization': 'Key ' + PAT
+          'Authorization': 'Key ' + process.env.PAT
       },
       body: raw
     };
