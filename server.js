@@ -7,6 +7,7 @@ const register = require('./register')
 const signin = require('./signin')
 const profile = require('./profile')
 const image = require('./image')
+const path = require('path');
 
 const db = knex({
   client: 'pg',
@@ -24,6 +25,18 @@ const db = knex({
 app.use(express.json());
 app.use(cors());
 
+// Serve static files from the React app
+const buildPath = path.join(__dirname, '..', 'photobrain', 'build');
+app.use(express.static(buildPath, {
+  setHeaders: (res, path) => {
+    if (path.endsWith('.css')) {
+      res.setHeader('Content-Type', 'text/css');
+    } else if (path.endsWith('.js')) {
+      res.setHeader('Content-Type', 'application/javascript');
+    }
+  }
+}));
+
 // app.get('/', (req, res) => {
 //     res.send("success")
 // })
@@ -37,6 +50,11 @@ app.get('/profile/:id', (req, res) => {profile.handleProfileGet(req, res, db)});
 app.put('/image', (req, res) => {image.handleImage(req, res, db)});
 
 app.post('/imageurl', (req, res) => {image.handleApiCall(req, res)});
+
+// The "catchall" handler: for any request that doesn't match one above, send back React's index.html file.
+app.get('*', (req, res) => {
+  res.sendFile(path.join(buildPath, 'index.html'));
+});
 
 app.listen(process.env.PORT || 3000, () => {
     console.log(`app is running on port ${process.env.PORT}`)
